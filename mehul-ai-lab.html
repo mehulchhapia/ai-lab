@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mehul's AI Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0c0f;
+    --surface: #13131a;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #f97316;
+    --accent3: #22d3ee;
+    --accent4: #a3e635;
+    --text: #e8e8f0;
+    --muted: #6b6b85;
+    --tag-bg: #1e1e2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,106,247,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,247,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glowing orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+    animation: drift 20s ease-in-out infinite;
+  }
+  .orb-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -200px; }
+  .orb-2 { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; right: -100px; animation-delay: -10s; }
+  .orb-3 { width: 300px; height: 300px; background: var(--accent3); top: 40%; left: 60%; animation-delay: -5s; }
+
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(30px, -20px); }
+    66% { transform: translate(-20px, 30px); }
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 64px 0 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(48px, 7vw, 80px);
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 480px;
+    margin-top: 16px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .meta-chip:hover { border-color: var(--accent); color: var(--text); }
+  .meta-chip a { color: inherit; text-decoration: none; }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent4); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 8px 0 48px;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Project grid */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
+  /* Project card */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    animation: fadeUp 0.5s ease both;
+    text-decoration: none;
+    display: block;
+  }
+
+  .project-card:hover {
+    background: var(--surface2);
+    border-color: var(--card-accent, var(--accent));
+  }
+
+  .project-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .project-card:hover::after { transform: scaleX(1); }
+
+  .project-card.full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Card number */
+  .card-num {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Card icon */
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  /* Card title */
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  /* Card desc */
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--tag-bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    letter-spacing: 0.05em;
+  }
+
+  /* Status badge */
+  .status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .status-live { background: rgba(163,230,53,0.1); color: var(--accent4); border: 1px solid rgba(163,230,53,0.2); }
+  .status-building { background: rgba(249,115,22,0.1); color: var(--accent2); border: 1px solid rgba(249,115,22,0.2); }
+  .status-idea { background: rgba(34,211,238,0.1); color: var(--accent3); border: 1px solid rgba(34,211,238,0.2); }
+
+  /* Add new project card */
+  .add-card {
+    background: transparent;
+    border: 1px dashed var(--border);
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    min-height: 200px;
+  }
+
+  .add-card:hover {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.04);
+  }
+
+  .add-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .add-card:hover .add-icon { border-color: var(--accent); color: var(--accent); }
+
+  .add-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    animation: fadeUp 0.6s ease both;
+    animation-delay: 0.4s;
+  }
+
+  .footer-left {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .footer-left span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .footer-links a {
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Staggered card animations */
+  .project-card:nth-child(1) { animation-delay: 0.1s; }
+  .project-card:nth-child(2) { animation-delay: 0.15s; }
+  .project-card:nth-child(3) { animation-delay: 0.2s; }
+  .project-card:nth-child(4) { animation-delay: 0.25s; }
+  .project-card:nth-child(5) { animation-delay: 0.3s; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.full-width { grid-column: 1; }
+    header { padding: 40px 0 32px; }
+  }
+
+  /* Inline edit hint */
+  [contenteditable]:focus {
+    outline: none;
+    background: rgba(124,106,247,0.06);
+    border-radius: 2px;
+  }
+
+  .edit-hint {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 12px 0 0;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="container">
+
+  <header>
+    <div class="header-eyebrow">personal lab</div>
+    <h1>Mehul's<br><em>AI Experiments</em></h1>
+    <p class="header-sub">A running log of social, fun, and exploratory AI projects — things I'm building, breaking, and learning from outside of work.</p>
+    <div class="header-meta">
+      <div class="meta-chip"><div class="dot"></div> Actively building</div>
+      <div class="meta-chip"><a href="https://www.linkedin.com/in/theproductwala" target="_blank">↗ linkedin</a></div>
+      <div class="meta-chip">Bangalore, India</div>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <div class="section-label">projects</div>
+
+  <div class="projects-grid">
+
+    <!-- Card 1 -->
+    <div class="project-card" style="--card-accent: #7c6af7; animation-delay: 0.1s">
+      <span class="status status-building">Building</span>
+      <span class="card-num">01</span>
+      <span class="card-icon">🧠</span>
+      <div class="card-title" contenteditable="true">Project Name Here</div>
+      <div class="card-desc" contenteditable="true">A short description of what this project does, why you built it, and what makes it interesting. Click to edit.</div>
+      <div class="tags">
+        <span class="tag">claude api</span>
+        <span class="tag">automation</span>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="project-card" style="--card-accent: #f97316; animation-delay: 0.15s">
+      <span class="status status-idea">Idea</span>
+      <span class="card-num">02</span>
+      <span class="card-icon">🎲</span>
+      <div class="card-title" contenteditable="true">Project Name Here</div>
+      <div class="card-desc" contenteditable="true">A short description of what this project does, why you built it, and what makes it interesting. Click to edit.</div>
+      <div class="tags">
+        <span class="tag">gpt-4</span>
+        <span class="tag">social</span>
+      </div>
+    </div>
+
+    <!-- Card 3 - full width featured -->
+    <div class="project-card full-width" style="--card-accent: #22d3ee; animation-delay: 0.2s">
+      <span class="status status-live">Live</span>
+      <span class="card-num">03 — featured</span>
+      <span class="card-icon">✨</span>
+      <div class="card-title" contenteditable="true">Your Featured Project</div>
+      <div class="card-desc" contenteditable="true">Use this full-width card for your best or most complete project. Describe the problem, what you built, how AI is used, and what you learned. This is great for something you'd want to demo or share with people.</div>
+      <div class="tags">
+        <span class="tag">llm</span>
+        <span class="tag">product</span>
+        <span class="tag">demo</span>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="project-card" style="--card-accent: #a3e635; animation-delay: 0.25s">
+      <span class="status status-building">Building</span>
+      <span class="card-num">04</span>
+      <span class="card-icon">🤖</span>
+      <div class="card-title" contenteditable="true">Project Name Here</div>
+      <div class="card-desc" contenteditable="true">A short description of what this project does, why you built it, and what makes it interesting. Click to edit.</div>
+      <div class="tags">
+        <span class="tag">agents</span>
+        <span class="tag">fun</span>
+      </div>
+    </div>
+
+    <!-- Add new -->
+    <div class="add-card" onclick="addProject()">
+      <div class="add-icon">+</div>
+      <div class="add-label">add project</div>
+    </div>
+
+  </div>
+
+  <p class="edit-hint">✦ all text fields are editable — click any title or description to edit inline</p>
+
+  <footer>
+    <div class="footer-left">Built by <span>Mehul Chhapia</span> · 2026</div>
+    <div class="footer-links">
+      <a href="https://www.linkedin.com/in/theproductwala" target="_blank">LinkedIn</a>
+      <a href="mailto:mehulchhapia@gmail.com">Email</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+function addProject() {
+  const grid = document.querySelector('.projects-grid');
+  const addCard = document.querySelector('.add-card');
+
+  const n = grid.querySelectorAll('.project-card').length + 1;
+  const colors = ['#7c6af7','#f97316','#22d3ee','#a3e635','#f472b6'];
+  const icons = ['🔬','💡','🚀','🎯','🌀','⚡','🧩'];
+  const color = colors[(n - 1) % colors.length];
+  const icon = icons[(n - 1) % icons.length];
+
+  const card = document.createElement('div');
+  card.className = 'project-card';
+  card.style.setProperty('--card-accent', color);
+  card.innerHTML = `
+    <span class="status status-idea">Idea</span>
+    <span class="card-num">0${n}</span>
+    <span class="card-icon">${icon}</span>
+    <div class="card-title" contenteditable="true">New Project</div>
+    <div class="card-desc" contenteditable="true">Describe what you're building here. Click to edit.</div>
+    <div class="tags"><span class="tag">ai</span><span class="tag">experiment</span></div>
+  `;
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(12px)';
+  grid.insertBefore(card, addCard);
+  requestAnimationFrame(() => {
+    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+  });
+  card.querySelector('[contenteditable]').focus();
+}
+</script>
+
+</body>
+</html>
